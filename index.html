@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>八字命理</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div id="sidebar-list">
+      <div class="person-item" data-action="add">
+        <div class="avatar add-avatar"><span>+</span></div>
+      </div>
+    </div>
+    <div id="sidebar-divine">
+      <button class="sb-btn divine-btn" id="btn-divine">☰ 占卜</button>
+    </div>
+    <div id="sidebar-footer">
+      <button class="sb-btn" id="btn-import">导入</button>
+      <button class="sb-btn" id="btn-export">导出</button>
+    </div>
+  </aside>
+
+  <main id="panel">
+    <section id="sec-input">
+      <div id="avatar-area">
+        <div class="avatar form-avatar" id="form-avatar">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </div>
+        <small>点击上传头像</small>
+      </div>
+      <div class="form-grid">
+        <label>姓名</label><input id="f-name" placeholder="请输入姓名">
+        <label>性别</label>
+        <select id="f-gender"><option value="男">男</option><option value="女">女</option></select>
+        <label>出生日期</label>
+        <div class="date-inputs">
+          <input id="f-year" type="number" placeholder="年" min="1900" max="2100">
+          <span>年</span>
+          <input id="f-month" type="number" placeholder="月" min="1" max="12">
+          <span>月</span>
+          <input id="f-day" type="number" placeholder="日" min="1" max="31">
+          <span>日</span>
+        </div>
+        <label>时辰</label>
+        <select id="f-hour">
+          <option value="子时">子时 (23:00-01:00)</option>
+          <option value="丑时">丑时 (01:00-03:00)</option>
+          <option value="寅时">寅时 (03:00-05:00)</option>
+          <option value="卯时">卯时 (05:00-07:00)</option>
+          <option value="辰时">辰时 (07:00-09:00)</option>
+          <option value="巳时">巳时 (09:00-11:00)</option>
+          <option value="午时">午时 (11:00-13:00)</option>
+          <option value="未时">未时 (13:00-15:00)</option>
+          <option value="申时">申时 (15:00-17:00)</option>
+          <option value="酉时">酉时 (17:00-19:00)</option>
+          <option value="戌时">戌时 (19:00-21:00)</option>
+          <option value="亥时">亥时 (21:00-23:00)</option>
+        </select>
+        <label>出生地</label><input id="f-birthplace" placeholder="请输入出生地">
+        <label>常居地</label><input id="f-residence" placeholder="请输入常居地">
+      </div>
+      <div class="btn-row">
+        <button id="btn-paipan" class="primary-btn">开始排盘</button>
+        <button id="btn-export-pdf" class="primary-btn" disabled>导出PDF</button>
+      </div>
+    </section>
+
+    <div id="loading-paipan" class="loading" hidden>排盘中...</div>
+
+    <section id="sec-chart" hidden>
+      <div id="chart-content"></div>
+      <button id="btn-tuili" class="primary-btn">开始推理</button>
+    </section>
+
+    <div id="loading-tuili" class="loading" hidden>推理中...</div>
+
+    <section id="sec-infer" hidden>
+      <div id="infer-split">
+        <div id="infer-left"></div>
+        <div id="infer-right">
+          <div id="year-header">
+            <label>选择年份：</label>
+            <select id="sel-year"></select>
+          </div>
+          <div id="year-content"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 占卜页 ===== -->
+    <section id="sec-divine" hidden>
+      <div class="divine-header">
+        <h2>☰ 六爻占卜 ☰</h2>
+        <button class="secondary-btn" id="btn-divine-history">历史记录</button>
+      </div>
+
+      <div class="divine-top">
+        <label class="divine-label">请输入您的问题：</label>
+        <textarea id="divine-question" class="divine-input" rows="2" placeholder="请输入想要占卜的问题..."></textarea>
+        <div class="divine-hint">点击硬币翻转正反面，正面=☉ 反面=☽</div>
+        <div id="coin-grid"></div>
+        <div class="btn-row">
+          <button class="primary-btn" id="btn-divine-start">开始推理</button>
+          <button class="primary-btn" id="btn-divine-export" disabled>导出结果</button>
+        </div>
+      </div>
+
+      <div id="divine-loading" class="loading" hidden>分析中...</div>
+      <div id="divine-result"></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg-divine-history">
+  <h3>占卜历史</h3>
+  <div id="divine-history-list" style="max-height:400px;overflow-y:auto"></div>
+  <div class="dlg-footer">
+    <button class="secondary-btn" id="btn-history-close">关闭</button>
+  </div>
+</dialog>
+
+<dialog id="dlg-export">
+  <h3>导出PDF — 选择内容</h3>
+  <div class="export-options">
+    <label><input type="checkbox" name="exp" value="personality" checked> 性格分析</label>
+    <label><input type="checkbox" name="exp" value="career" checked> 事业运</label>
+    <label><input type="checkbox" name="exp" value="wealth" checked> 财运</label>
+    <label><input type="checkbox" name="exp" value="education" checked> 学业</label>
+    <label><input type="checkbox" name="exp" value="love" checked> 爱情婚姻</label>
+    <label><input type="checkbox" name="exp" value="majorLuck" checked> 大运详解</label>
+    <div class="liunian-row">
+      <label><input type="checkbox" name="exp" value="liunian" checked> 流年</label>
+      <select id="export-year"></select>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <button class="secondary-btn" id="btn-export-cancel">取消</button>
+    <button class="primary-btn" id="btn-export-confirm">确认导出</button>
+  </div>
+</dialog>
+
+<script src="renderer.js"></script>
+</body>
+</html>
